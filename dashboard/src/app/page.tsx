@@ -30,12 +30,9 @@ export default function DashboardPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
-  const [history, setHistory] = useState<SensorReading[]>(() => generateHistory(24))
-  const [reading, setReading] = useState<SensorReading | null>(() => {
-    const h = generateHistory(24)
-    return h[h.length - 1] ?? null
-  })
-  const [lastUpdated, setLastUpdated] = useState<Date>(new Date())
+  const [history, setHistory] = useState<SensorReading[]>([])
+  const [reading, setReading] = useState<SensorReading | null>(null)
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
 
   const thresholds = getThresholds(crop)
 
@@ -87,15 +84,38 @@ export default function DashboardPage() {
   }, [checks])
 
   useEffect(() => {
-    if (!demoMode) return
+    if (demoMode) {
+      const interval = setInterval(() => {
+        const next = generateMockReading()
+        setReading(next)
+        setLastUpdated(new Date())
+        setHistory((prev) => [...prev.slice(-200), next])
+      }, 1500)
+      return () => clearInterval(interval)
+    }
+  }, [demoMode])
 
-    const interval = setInterval(() => {
-      const next = generateMockReading()
-      setReading(next)
-      setLastUpdated(new Date())
-      setHistory((prev) => [...prev.slice(-200), next])
-    }, 1500)
+  useEffect(() => {
+    if (demoMode) return
 
+    const fetchReadings = async () => {
+      try {
+        const res = await fetch('/api/readings')
+        const data = await res.json()
+        if (data.latest) {
+          setReading(data.latest)
+          setLastUpdated(new Date(data.latest.timestamp))
+        }
+        if (data.history?.length) {
+          setHistory(data.history.reverse())
+        }
+      } catch {
+        // API not reachable — keep current data
+      }
+    }
+
+    fetchReadings()
+    const interval = setInterval(fetchReadings, 5000)
     return () => clearInterval(interval)
   }, [demoMode])
 

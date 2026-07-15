@@ -1,23 +1,9 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { insertReading, getLatest, getHistory, rowToPayload, cleanupOldReadings } from '@/lib/db'
 
-interface ReadingPayload {
-  deviceId: string
-  timestamp?: string
-  soilMoisture?: number
-  ph?: number
-  tds1?: number
-  tds2?: number
-  rssi?: number
-  battery?: number | null
-}
-
-// In-memory store (replace with database later)
-let latestReading: ReadingPayload | null = null
-const history: ReadingPayload[] = []
-
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const body: ReadingPayload = await request.json()
+    const body = await request.json()
 
     if (!body.deviceId) {
       return NextResponse.json(
@@ -26,7 +12,7 @@ export async function POST(request: Request) {
       )
     }
 
-    const reading: ReadingPayload = {
+    insertReading({
       deviceId: body.deviceId,
       timestamp: body.timestamp ?? new Date().toISOString(),
       soilMoisture: body.soilMoisture,
@@ -35,11 +21,9 @@ export async function POST(request: Request) {
       tds2: body.tds2,
       rssi: body.rssi,
       battery: body.battery ?? null,
-    }
+    })
 
-    latestReading = reading
-    history.push(reading)
-    if (history.length > 1000) history.shift()
+    cleanupOldReadings(30)
 
     return NextResponse.json({ ok: true })
   } catch {
@@ -50,9 +34,15 @@ export async function POST(request: Request) {
   }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const deviceId = request.nextUrl.searchParams.get('deviceId') ?? 'gateway-01'
+  const limit = Math.min(Number(request.nextUrl.searchParams.get('limit')) || 200, 1000)
+
+  const latest = getLatest(deviceId)
+  const history = getHistory(deviceId, limit)
+
   return NextResponse.json({
-    latest: latestReading,
-    history: history.slice(-200),
+    latest: latest ? rowToPayload(latest) : null,
+    history: history.map(rowToPayload),
   })
 }
