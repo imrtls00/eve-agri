@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react'
 import { cn } from '@/lib/utils'
-import { FlaskConical } from 'lucide-react'
+import { FlaskConical, ChevronDown } from 'lucide-react'
 import { PanelCard } from '@/components/shared/cards'
 import { StatusBadge } from '@/components/shared/badges'
 import type { StatusLevel } from '@/lib/metrics'
@@ -69,41 +69,41 @@ export function PhGauge({ value, idealMin, idealMax, delta, cropLabel, className
       </div>
 
       {/* SVG gauge */}
-      <svg width="100%" height={HEIGHT} viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="overflow-visible">
-        {/* Background track */}
-        <rect x={0} y={BAR_Y} width={WIDTH} height={BAR_H} rx={2} style={{ fill: 'var(--color-border-faint)' }} />
+      <div className="relative">
+        <svg width="100%" height={HEIGHT} viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="overflow-visible">
+          {/* Background track */}
+          <rect x={0} y={BAR_Y} width={WIDTH} height={BAR_H} rx={2} style={{ fill: 'var(--color-border-faint)' }} />
 
-        {/* Acidic zone (red tint) */}
-        <rect x={0} y={BAR_Y} width={idealStart} height={BAR_H} rx={2} style={{ fill: 'var(--color-zone-warning)' }} />
+          {/* Acidic zone (red tint) */}
+          <rect x={0} y={BAR_Y} width={idealStart} height={BAR_H} rx={2} style={{ fill: 'var(--color-zone-warning)' }} />
 
-        {/* Alkaline zone (red tint) */}
-        <rect x={idealEnd} y={BAR_Y} width={WIDTH - idealEnd} height={BAR_H} rx={2} style={{ fill: 'var(--color-zone-warning)' }} />
+          {/* Alkaline zone (red tint) */}
+          <rect x={idealEnd} y={BAR_Y} width={WIDTH - idealEnd} height={BAR_H} rx={2} style={{ fill: 'var(--color-zone-warning)' }} />
 
-        {/* Ideal range (green tint) */}
-        <rect x={idealStart} y={BAR_Y} width={idealEnd - idealStart} height={BAR_H} rx={2} style={{ fill: 'var(--color-zone-healthy)' }} />
+          {/* Ideal range (green tint) */}
+          <rect x={idealStart} y={BAR_Y} width={idealEnd - idealStart} height={BAR_H} rx={2} style={{ fill: 'var(--color-zone-healthy)' }} />
 
-        {/* Tick marks at key pH values */}
-        {[0, 2, 4, 6, 7, 8, 10, 12, 14].map((ph) => (
-          <g key={ph}>
-            <line
-              x1={xFromPh(ph)} y1={BAR_Y + BAR_H + 2}
-              x2={xFromPh(ph)} y2={BAR_Y + BAR_H + 6}
-              style={{ stroke: 'var(--color-border-divider)' }}
-              strokeWidth={1}
-            />
-            <text
-              x={xFromPh(ph)} y={BAR_Y + BAR_H + 16}
-              textAnchor="middle"
-              className="text-[8px] fill-text-tertiary"
-            >
-              {ph}
-            </text>
-          </g>
-        ))}
+          {/* Tick marks at key pH values */}
+          {[0, 2, 4, 6, 7, 8, 10, 12, 14].map((ph) => (
+            <g key={ph}>
+              <line
+                x1={xFromPh(ph)} y1={BAR_Y + BAR_H + 2}
+                x2={xFromPh(ph)} y2={BAR_Y + BAR_H + 6}
+                style={{ stroke: 'var(--color-border-divider)' }}
+                strokeWidth={1}
+              />
+              <text
+                x={xFromPh(ph)} y={BAR_Y + BAR_H + 16}
+                textAnchor="middle"
+                className="text-[8px] fill-text-tertiary"
+              >
+                {ph}
+              </text>
+            </g>
+          ))}
 
-        {/* Value needle */}
-        {value !== null && (
-          <g>
+          {/* Value needle */}
+          {value !== null && (
             <line
               x1={xFromPh(value)} y1={BAR_Y - 4}
               x2={xFromPh(value)} y2={BAR_Y + BAR_H + 4}
@@ -112,15 +112,22 @@ export function PhGauge({ value, idealMin, idealMax, delta, cropLabel, className
               strokeLinecap="round"
               className="transition-all duration-500 ease-out"
             />
-            {/* Triangle pointer */}
-            <polygon
-              points={`${xFromPh(value) - 4},${BAR_Y - 4} ${xFromPh(value) + 4},${BAR_Y - 4} ${xFromPh(value)},${BAR_Y - 10}`}
-              style={{ fill: 'var(--color-cherry-100)' }}
-              className="transition-all duration-500 ease-out"
-            />
-          </g>
+          )}
+        </svg>
+
+        {value !== null && (
+          <ChevronDown
+            strokeWidth={3}
+            size={16}
+            className="absolute text-cherry-100 transition-all duration-500 ease-out"
+            style={{
+              left: `${(xFromPh(value) / WIDTH) * 100}%`,
+              top: `${BAR_Y - 14}px`,
+              transform: 'translateX(-50%)',
+            }}
+          />
         )}
-      </svg>
+      </div>
 
       {/* Crop ideal range */}
       <p className="text-label-medium text-text-tertiary mt-8">
