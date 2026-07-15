@@ -1,0 +1,165 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, monospace;
+
+  /* ── Colors ────────────────────────────────── */
+  --color-canvas-base: #F5F2EC;
+  --color-canvas-surface: #FFFFFF;
+  --color-canvas-hover: #EFE9DE;
+
+  --color-cherry-100: #C62828;
+  --color-cherry-hover: #A81F1F;
+  --color-cherry-tint: #FCECEC;
+
+  --color-border-faint: #E7E1D7;
+  --color-border-divider: #DDD5C9;
+
+  --color-text-primary: #181818;
+  --color-text-secondary: #666666;
+  --color-text-tertiary: #9A9A9A;
+
+  --color-status-success: #2E7D32;
+  --color-status-warning: #D9822B;
+  --color-status-danger: #C62828;
+
+  /* ── Spacing (literal pixels for DESIGN.md values) ── */
+  --spacing-px: 1px;
+  --spacing-0: 0px;
+  --spacing-4: 4px;
+  --spacing-8: 8px;
+  --spacing-12: 12px;
+  --spacing-16: 16px;
+  --spacing-24: 24px;
+  --spacing-32: 32px;
+  --spacing-48: 48px;
+  --spacing-64: 64px;
+  --spacing-72: 72px;
+  --spacing-96: 96px;
+  --spacing-280: 280px;
+
+  /* ── Radii ──────────────────────────────────── */
+  --radius: 0px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
+  --radius-2: 2px;
+  --radius-4: 4px;
+  --radius-6: 6px;
+  --radius-12: 12px;
+  --radius-16: 16px;
+
+  /* ── Responsive breakpoints (matches DESIGN.md) ── */
+  --breakpoint-sm: 576px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 996px;
+  --breakpoint-xl: 1200px;
+
+  /* ── Shadows ────────────────────────────────── */
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.03);
+
+  /* ── Legacy shadcn aliases (map to DESIGN.md tokens) ── */
+  --background: #F5F2EC;
+  --foreground: #181818;
+  --card: #FFFFFF;
+  --card-foreground: #181818;
+  --popover: #FFFFFF;
+  --popover-foreground: #181818;
+  --primary: #C62828;
+  --primary-foreground: #FFFFFF;
+  --secondary: #EFE9DE;
+  --secondary-foreground: #666666;
+  --muted: #F5F2EC;
+  --muted-foreground: #9A9A9A;
+  --accent: #EFE9DE;
+  --accent-foreground: #181818;
+  --destructive: #C62828;
+  --border: #E7E1D7;
+  --input: #E7E1D7;
+  --ring: #C62828;
+  --chart-1: #C62828;
+  --chart-2: #2E7D32;
+  --chart-3: #D9822B;
+  --chart-4: #666666;
+  --chart-5: #9A9A9A;
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #181818;
+  --sidebar-primary: #C62828;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #EFE9DE;
+  --sidebar-accent-foreground: #181818;
+  --sidebar-border: #E7E1D7;
+  --sidebar-ring: #C62828;
+}
+
+/* ── Base layer ─────────────────────────────── */
+@layer base {
+  * {
+    @apply border-border-faint;
+  }
+  body {
+    @apply bg-canvas-base text-text-primary font-sans antialiased;
+  }
+  :root {
+    --color-zone-warning: oklch(0.6 0.2 25 / 0.15);
+    --color-zone-healthy: oklch(0.5 0.15 145 / 0.2);
+    --color-zone-warning-subtle: oklch(0.6 0.2 25 / 0.08);
+    --color-zone-healthy-subtle: oklch(0.5 0.15 145 / 0.15);
+    --color-zone-healthy-arc: oklch(0.5 0.15 145 / 0.3);
+  }
+}
+
+/* ── Animations ─────────────────────────────── */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes chart-draw {
+  from { stroke-dashoffset: var(--chart-length, 1000); }
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes shimmer {
+  from { background-position: -200% 0; }
+  to { background-position: 200% 0; }
+}
+
+@utility animate-fade-in {
+  animation: fade-in 0.35s ease-out;
+}
+
+@utility animate-slide-up {
+  animation: slide-up 0.35s ease-out;
+}
+
+@utility animate-scale-in {
+  animation: scale-in 0.35s ease-out;
+}
+
+@utility animate-chart-draw {
+  animation: chart-draw 1s ease-out forwards;
+}
+
+@utility animate-shimmer {
+  background: linear-gradient(90deg, var(--canvas-hover) 25%, var(--canvas-surface) 50%, var(--canvas-hover) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
