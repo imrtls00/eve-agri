@@ -19,11 +19,11 @@
 #include <ArduinoJson.h>
 
 // ──── CONFIG (set before upload) ────
-const char* WIFI_SSID = "YOUR_SSID";
-const char* WIFI_PASS = "YOUR_PASSWORD";
+const char* WIFI_SSID = "Hania";
+const char* WIFI_PASS = "Haia20032";
 
 const String GAS_URL =
-  "https://script.google.com/macros/s/YOUR_GAS_ID/exec";
+  "https://script.google.com/macros/s/AKfycbzggSZfIAPkzXkJ4BBFrv-ob-d5bgolb5TTx9TUWXRnDub3BnZebEU9pBSLXB7fVWP25Q/exec";
 
 const String API_URL =
   "http://your-dashboard/api/readings";
