@@ -38,6 +38,9 @@ yarn-error.log*
 
 # sqlite
 /data/readings.db
+/data/readings.db-shm
+/data/readings.db-wal
+*.db
 
 # typescript
 *.tsbuildinfo

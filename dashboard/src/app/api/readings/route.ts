@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    insertReading({
+    await insertReading({
       deviceId: body.deviceId,
       timestamp: body.timestamp ?? new Date().toISOString(),
       soilMoisture: body.soilMoisture,
@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
       battery: body.battery ?? null,
     })
 
-    cleanupOldReadings(30)
+    await cleanupOldReadings(30)
 
     return NextResponse.json({ ok: true })
   } catch {
@@ -38,8 +38,8 @@ export async function GET(request: NextRequest) {
   const deviceId = request.nextUrl.searchParams.get('deviceId') ?? 'gateway-01'
   const limit = Math.min(Number(request.nextUrl.searchParams.get('limit')) || 200, 1000)
 
-  const latest = getLatest(deviceId)
-  const history = getHistory(deviceId, limit)
+  const latest = await getLatest(deviceId)
+  const history = await getHistory(deviceId, limit)
 
   return NextResponse.json({
     latest: latest ? rowToPayload(latest) : null,
