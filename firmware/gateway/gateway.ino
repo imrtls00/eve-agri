@@ -26,10 +26,10 @@ const String GAS_URL =
   "https://script.google.com/macros/s/AKfycbzggSZfIAPkzXkJ4BBFrv-ob-d5bgolb5TTx9TUWXRnDub3BnZebEU9pBSLXB7fVWP25Q/exec";
 
 const String API_URL =
-  "https://<project>.supabase.co/rest/v1/readings";
+  "https://adjpbqavicngpltzwwwy.supabase.co/rest/v1/readings";
 
 const String SUPABASE_ANON_KEY =
-  "eyJ...";
+  "sb_publishable_7dxyARDl-2XeNDPURUu5qA_ii-6PK3R";
 
 const String DEVICE_ID = "gateway-01";
 
