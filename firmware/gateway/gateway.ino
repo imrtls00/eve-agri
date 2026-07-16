@@ -26,7 +26,10 @@ const String GAS_URL =
   "https://script.google.com/macros/s/AKfycbzggSZfIAPkzXkJ4BBFrv-ob-d5bgolb5TTx9TUWXRnDub3BnZebEU9pBSLXB7fVWP25Q/exec";
 
 const String API_URL =
-  "http://your-dashboard/api/readings";
+  "https://<project>.supabase.co/rest/v1/readings";
+
+const String SUPABASE_ANON_KEY =
+  "eyJ...";
 
 const String DEVICE_ID = "gateway-01";
 
@@ -213,15 +216,17 @@ void uploadReadings() {
     http.end();
   }
 
-  // 2 — Dashboard API (POST JSON — future system)
+  // 2 — Supabase REST API (POST JSON)
   {
     HTTPClient http;
     http.begin(API_URL);
     http.addHeader("Content-Type", "application/json");
+    http.addHeader("apikey", SUPABASE_ANON_KEY);
+    http.addHeader("Prefer", "return=minimal");
 
     JsonDocument doc;
-    doc["deviceId"]     = DEVICE_ID;
-    doc["soilMoisture"] = data.soil;
+    doc["device_id"]     = DEVICE_ID;
+    doc["soil_moisture"] = data.soil;
     doc["ph"]           = data.ph;
     doc["tds1"]         = data.tds1;
     doc["tds2"]         = data.tds2;
@@ -232,7 +237,7 @@ void uploadReadings() {
     serializeJson(doc, body);
     int code = http.POST(body);
     if (code > 0) {
-      Serial.print("API upload: HTTP ");
+      Serial.print("Supabase upload: HTTP ");
       Serial.println(code);
     }
     http.end();

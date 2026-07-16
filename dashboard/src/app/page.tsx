@@ -17,6 +17,7 @@ import { TdsGauge } from '@/components/app/dashboard/tds-gauge'
 import { DebugPanel } from '@/components/app/dashboard/debug-panel'
 import { StatusPanel, MetricPanel, SummaryPanel, RecommendationPanel, AlertPanel, ActionPanel } from '@/components/shared/panels'
 import { Info, Download, Settings } from 'lucide-react'
+import { createClient } from '@supabase/supabase-js'
 import { generateMockReading, generateHistory, findReadingNear } from '@/lib/mock-data'
 import { getThresholds, CROP_PRESETS } from '@/lib/crop-presets'
 import { evaluateAll } from '@/lib/status'
@@ -98,16 +99,54 @@ export default function DashboardPage() {
   useEffect(() => {
     if (demoMode) return
 
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!
+    )
+
     const fetchReadings = async () => {
       try {
-        const res = await fetch('/api/readings')
-        const data = await res.json()
-        if (data.latest) {
-          setReading(data.latest)
-          setLastUpdated(new Date(data.latest.timestamp))
+        const { data: latest } = await supabase
+          .from('readings')
+          .select('*')
+          .eq('device_id', 'gateway-01')
+          .order('timestamp', { ascending: false })
+          .limit(1)
+          .maybeSingle()
+
+        const { data: history } = await supabase
+          .from('readings')
+          .select('*')
+          .eq('device_id', 'gateway-01')
+          .order('timestamp', { ascending: false })
+          .limit(200)
+
+        if (latest) {
+          setReading({
+            deviceId: latest.device_id,
+            timestamp: latest.timestamp,
+            soilMoisture: latest.soil_moisture ?? 0,
+            ph: latest.ph ?? 0,
+            tds1: latest.tds1 ?? 0,
+            tds2: latest.tds2 ?? 0,
+            rssi: latest.rssi ?? 0,
+            battery: latest.battery ?? null,
+          })
+          setLastUpdated(new Date(latest.timestamp))
         }
-        if (data.history?.length) {
-          setHistory(data.history.reverse())
+        if (history?.length) {
+          setHistory(
+            (history as any[]).reverse().map((r: any) => ({
+              deviceId: r.device_id,
+              timestamp: r.timestamp,
+              soilMoisture: r.soil_moisture ?? 0,
+              ph: r.ph ?? 0,
+              tds1: r.tds1 ?? 0,
+              tds2: r.tds2 ?? 0,
+              rssi: r.rssi ?? 0,
+              battery: r.battery ?? null,
+            }))
+          )
         }
       } catch {
         // API not reachable — keep current data
